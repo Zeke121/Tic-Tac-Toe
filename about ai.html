@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About AI | Tic-Tac-Toe Minimax Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        nav {
+            width: 100%;
+            padding: 20px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(26, 26, 46, 0.95);
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a.active {
+            color: #f0ca62;
+            position: relative;
+        }
+        
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #f0ca62;
+        }
+        
+        .nav-links a:hover {
+            color: #f0ca62;
+        }
+        
+        .sign-up-btn {
+            background-color: #3a86ff;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .sign-up-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.5);
+        }
+        
+        .page-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 0 20px;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .page-title h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #3a86ff, #f0ca62);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        
+        .page-title p {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .about-ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        @media (max-width: 768px) {
+            .about-ai-grid {
+                grid-template-columns: 1fr;
+            }
+            .nav-links {
+                gap: 20px;
+            }
+        }
+        
+        .ai-section {
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+        
+        .ai-section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .ai-section h2 {
+            font-size: 1.8rem;
+            color: #f0ca62;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ai-section h2 .icon {
+            margin-right: 15px;
+            font-size: 2rem;
+        }
+        
+        .ai-section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #e6e6e6;
+            font-size: 1.05rem;
+        }
+        
+        .ai-section ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .ai-section li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .algorithm-visual {
+            background-color: #0f172a;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .algorithm-visual::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #3a86ff, #f0ca62);
+        }
+        
+        .code-comment {
+            color: #64748b;
+        }
+        
+        .code-keyword {
+            color: #e94560;
+        }
+        
+        .code-function {
+            color: #3a86ff;
+        }
+        
+        .code-value {
+            color: #f0ca62;
+        }
+        
+        .minimax-diagram {
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .minimax-tree {
+            margin: 20px auto;
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 300px;
+        }
+        
+        .tree-node {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .tree-node:hover {
+            transform: scale(1.2);
+            z-index: 5;
+        }
+        
+        .max-node {
+            background-color: #3a86ff;
+        }
+        
+        .min-node {
+            background-color: #e94560;
+        }
+        
+        .tree-line {
+            position: absolute;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.5);
+            transform-origin: left center;
+        }
+        
+        .ai-difficulty {
+            background-color: #16213e;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 40px 0;
+        }
+        
+        .difficulty-levels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .difficulty-card {
+            background: linear-gradient(145deg, #1d2746, #15192e);
+            border-radius: 8px;
+            padding: 20px;
+            width: calc(33.33% - 20px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .difficulty-card {
+                width: 100%;
+            }
+        }
+        
+        .difficulty-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .difficulty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .beginner .difficulty-icon {
+            color: #2ec4b6;
+        }
+        
+        .intermediate .difficulty-icon {
+            color: #f0ca62;
+        }
+        
+        .expert .difficulty-icon {
+            color: #e94560;
+        }
+        
+        .difficulty-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .beginner h3 {
+            color: #2ec4b6;
+        }
+        
+        .intermediate h3 {
+            color: #f0ca62;
+        }
+        
+        .expert h3 {
+            color: #e94560;
+        }
+        
+        .difficulty-card p {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+        
+        .faq-section {
+            margin: 60px 0;
+        }
+        
+        .faq-item {
+            background-color: #16213e;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+        }
+        
+        .faq-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .faq-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f0ca62;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .faq-question::before {
+            content: 'Q:';
+            margin-right: 10px;
+            font-size: 1.4rem;
+            color: #3a86ff;
+        }
+        
+        .faq-answer {
+            line-height: 1.8;
+            color: #e6e6e6;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .faq-answer::before {
+            content: 'A:';
+            position: absolute;
+            left: 0;
+            color: #e94560;
+            font-weight: bold;
+        }
+        
+        .cta-section {
+            background: linear-gradient(145deg, #3a86ff, #7b2cbf);
+            border-radius: 12px;
+            padding: 50px;
+            text-align: center;
+            margin: 60px 0;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .play-now-btn {
+            background-color: #f0ca62;
+            color: #16213e;
+            padding: 16px 36px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .play-now-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+       /* Footer Styles */
+        footer {
+            background-color: #0f172a;
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+	    
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .footer-column {
+            width: 30%;
+            min-width: 250px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            color: #f0ca62;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: #3a86ff;
+        }
+        
+        .footer-column p, .footer-column a {
+            color: #ccc;
+            margin-bottom: 10px;
+            display: block;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: #f0ca62;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+	    padding: 10px;
+            background-color: #16213e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-5px);
+            background-color: #3a86ff;
+        }
+        
+        .copyright {
+            width: 100%;
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #2d3748;
+            margin-top: 20px;
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-links">
+           <a href="index.html">HOME</a>
+                <a href="how it works.html">HOW IT WORKS</a>
+                <a href="play now.html">PLAY NOW</a>
+                <a href="leaderboard.html">LEADERBOARD</a>
+                <a href="about ai.html">ABOUT AI</a>
+        </div>
+        <a href="play now.html" class="sign-up-btn">PLAY NOW →</a>
+    </nav>
+    
+    <div class="page-container">
+        <div class="page-title">
+            <h1>UNDERSTANDING THE AI</h1>
+            <p>Discover how our Tic-Tac-Toe AI uses advanced algorithms to create the perfect opponent</p>
+        </div>
+        
+        <div class="about-ai-grid">
+            <div class="ai-section">
+                <h2><span class="icon">🧠</span>The Minimax Algorithm</h2>
+                <p>The unbeatable AI opponent in our Tic-Tac-Toe game uses the Minimax algorithm, a decision-making algorithm used in game theory and artificial intelligence.</p>
+                <p>Minimax is a recursive algorithm that excels at finding the optimal move in zero-sum games (where one player's gain is another's loss), particularly in games with perfect information like Tic-Tac-Toe, Chess, and Go.</p>
+                
+                <div class="algorithm-visual">
+                    <span class="code-comment">// The core minimax function</span><br>
+                    <span class="code-keyword">function</span> <span class="code-function">minimax</span>(board, depth, isMaximizingPlayer) {<br>
+                    &nbsp;&nbsp;<span class="code-comment">// Check for terminal states (win/lose/draw)</span><br>
+                    &nbsp;&nbsp;<span class="code-keyword">if</span> (gameOver || depth == 0) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> evaluateBoard(board);<br>
+                    &nbsp;&nbsp;}<br><br>
+                    
+                    &nbsp;&nbsp;<span class="code-comment">// Maximizing player's turn (AI)</span><br>
+                    &nbsp;&nbsp;<span class="code-keyword">if</span> (isMaximizingPlayer) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">let</span> bestScore = <span class="code-value">-Infinity</span>;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> (move of possibleMoves) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;makeMove(move);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">let</span> score = minimax(board, depth-1, <span class="code-value">false</span>);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;undoMove(move);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bestScore = Math.max(score, bestScore);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> bestScore;<br>
+                    &nbsp;&nbsp;}<br><br>
+                    
+                    &nbsp;&nbsp;<span class="code-comment">// Minimizing player's turn (Human)</span><br>
+                    &nbsp;&nbsp;<span class="code-keyword">else</span> {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">let</span> bestScore = <span class="code-value">Infinity</span>;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> (move of possibleMoves) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;makeMove(move);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">let</span> score = minimax(board, depth-1, <span class="code-value">true</span>);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;undoMove(move);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bestScore = Math.min(score, bestScore);<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> bestScore;<br>
+                    &nbsp;&nbsp;}<br>
+                    }
+                </div>
+                
+                <p>The algorithm simulates all possible game states to find the optimal move by:</p>
+                <ul>
+                    <li>Recursively examining all possible moves</li>
+                    <li>Building a game tree with all possible outcomes</li>
+                    <li>Evaluating terminal positions (win, lose, draw)</li>
+                    <li>Backing up values through the tree to determine the best move</li>
+                </ul>
+            </div>
+            
+            <div class="ai-section">
+                <h2><span class="icon">📊</span>How It Works in Tic-Tac-Toe</h2>
+                <p>In Tic-Tac-Toe, the minimax algorithm creates a complete game tree exploring all possible moves and countermoves to determine the optimal strategy.</p>
+                <p>For a 3×3 game board, there are 9! = 362,880 possible game sequences, but many lead to identical positions. After accounting for symmetry and early game endings, there are only 26,830 distinct board positions.</p>
+                <p>The algorithm assigns values to each board state:</p>
+                <ul>
+                    <li>+10 for AI win states</li>
+                    <li>-10 for human win states</li>
+                    <li>0 for draw states</li>
+                </ul>
+                <p>When it's the AI's turn, it chooses the move with the maximum score (hence "max"). When it's the human player's turn, the algorithm assumes the human will choose the move with the minimum score (hence "min").</p>
+                <p>We also implement Alpha-Beta Pruning to optimize the algorithm by eliminating branches that cannot possibly influence the final decision, dramatically improving performance.</p>
+            </div>
+        </div>
+        
+        <div class="minimax-diagram">
+            <h2>Minimax Decision Tree Visualization</h2>
+            <p>See how the AI evaluates moves looking ahead to find the optimal path</p>
+            
+            <div class="minimax-tree">
+                <!-- Root node -->
+                <div class="tree-node max-node" style="top: 0; left: calc(50% - 25px);">+1</div>
+                
+                <!-- Level 1 nodes -->
+                <div class="tree-node min-node" style="top: 80px; left: calc(25% - 25px);">-1</div>
+                <div class="tree-node min-node" style="top: 80px; left: calc(50% - 25px);">+1</div>
+                <div class="tree-node min-node" style="top: 80px; left: calc(75% - 25px);">0</div>
+                
+                <!-- Level 2 nodes -->
+                <div class="tree-node max-node" style="top: 160px; left: calc(12.5% - 25px);">-1</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(25% - 25px);">0</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(37.5% - 25px);">+2</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(50% - 25px);">+1</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(62.5% - 25px);">-3</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(75% - 25px);">0</div>
+                <div class="tree-node max-node" style="top: 160px; left: calc(87.5% - 25px);">-2</div>
+                
+                <!-- Level 3 leaf nodes -->
+                <div class="tree-node min-node" style="top: 240px; left: calc(6.25% - 25px);">-3</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(12.5% - 25px);">-1</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(18.75% - 25px);">+4</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(25% - 25px);">0</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(31.25% - 25px);">-2</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(37.5% - 25px);">+2</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(43.75% - 25px);">+1</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(50% - 25px);">+1</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(56.25% - 25px);">-1</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(62.5% - 25px);">-3</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(68.75% - 25px);">+2</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(75% - 25px);">0</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(81.25% - 25px);">-4</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(87.5% - 25px);">-2</div>
+                <div class="tree-node min-node" style="top: 240px; left: calc(93.75% - 25px);">+3</div>
+                
+                <!-- Connect lines from root to level 1 -->
+                <div class="tree-line" style="width: 177px; top: 25px; left: calc(50% - 25px); transform: rotate(30deg);"></div>
+                </div>
+		</div>
+		</div>
+
+		<!-- Footer Section -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>About Us</h3>
+                <p>We're passionate about AI and game theory. Our Tic-Tac-Toe challenges blend historical themes with cutting-edge algorithms.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">FB</a>
+                    <a href="#" class="social-link">TW</a>
+                    <a href="#" class="social-link">IG</a>
+                    <a href="#" class="social-link">YT</a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <a href="index.html">Home</a>
+                <a href="how it works.html">How It Works</a>
+                <a href="play now.html">Play Now</a>
+                <a href="leaderboard.html">Leaderboard</a>
+                <a href="about ai.html">About AI</a>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <p>Email: info@aitictactoe.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+                <p>Address: 123 Game Alley, AI Valley, CA 94043</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            &copy; 2025 AI Tic-Tac-Toe. All rights reserved. The Minimax Algorithm Perfected.
+        </div>
+    </footer>
+    </body>
+</html>
